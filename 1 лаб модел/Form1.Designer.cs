@@ -100,6 +100,7 @@ namespace _1_лаб_модел
             this.queue_lengthB_textBox1 = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
             this.queue_lengthA_textBox = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -750,11 +751,22 @@ namespace _1_лаб_модел
             this.queue_lengthA_textBox.TabIndex = 82;
             this.queue_lengthA_textBox.Text = "20";
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(821, 332);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(118, 36);
+            this.button3.TabIndex = 84;
+            this.button3.Text = "Параметр Стьюдента";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click_1);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(985, 717);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.label25);
             this.Controls.Add(this.queue_lengthA_textBox);
             this.Controls.Add(this.label24);
@@ -891,6 +903,7 @@ namespace _1_лаб_модел
         public System.Windows.Forms.TextBox queue_lengthB_textBox1;
         private System.Windows.Forms.Label label25;
         public System.Windows.Forms.TextBox queue_lengthA_textBox;
+        private System.Windows.Forms.Button button3;
     }
 }
 

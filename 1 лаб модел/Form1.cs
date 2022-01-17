@@ -18,7 +18,10 @@ namespace _1_лаб_модел
     public partial class Form1 : Form
     {
         //3 лаб
-     
+        Random random;
+        List<double> C;
+        List<double> q;
+
 
 
         int Ea_moment = 0;
@@ -165,6 +168,7 @@ namespace _1_лаб_модел
         {
             CheckForIllegalCrossThreadCalls = false;
             A();
+           
             new Thread(() =>
             {
                 BeginInvoke((MethodInvoker)(async () =>
@@ -174,7 +178,7 @@ namespace _1_лаб_модел
 
 
             }).Start();
-
+           
          //   await Task.Run(() => { modeling(); });
 
         }
@@ -229,6 +233,76 @@ namespace _1_лаб_модел
             public static double NormalDistributionFunction(double sigma, double m)
                 => (sigma * Math.Cos(2 * Math.PI * NormalRandom.NextDouble())
                     * Math.Sqrt(-2 * Math.Log(NormalRandom.NextDouble()))) + m;
+        }
+
+
+        //3 lab
+
+        
+
+        private double RandomNormal(double M, double G)
+        {
+            return G * Math.Cos(2 * Math.PI * random.NextDouble()) * Math.Sqrt(-2 * Math.Log(random.NextDouble())) + M;
+        }
+
+        private double CountRandom()
+        {
+            C = new List<double>(4) { 0.1225, 0.3065, 0.0096, 0.0454 };
+            q = new List<double>();
+            random = new Random();
+            q.Clear();
+            double M = 2.0;
+            double G = 0.6667;
+            for (int i = 0; i < C.Count; i++)
+            {
+                q.Add(RandomNormal(M, G));
+            }
+            double value = Enumerable.Range(0, C.Count).Select(i => C[i] * q[i]).Sum() + M;
+            q.Skip(1).ToList();
+            q.Add(RandomNormal(M, G));
+            return value;
+        }
+
+        private void StudentCriterion()
+        {
+            int N = 500;
+            List<double> a = new List<double>();
+            List<double> b = new List<double>();
+            for (int i = 0; i < N * 2; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    a.Add(CountRandom());
+                }
+                else
+                {
+                    b.Add(CountRandom());
+                }
+            }
+
+            double aM = a.Sum() / N;
+            double bM = b.Sum() / N;
+            double aD = 0;
+            double bD = 0;
+            for (int i = 0; i < N; i++)
+            {
+                aD += Math.Pow(a[i] - aM, 2) / (N - 1);
+                bD += Math.Pow(b[i] - bM, 2) / (N - 1);
+            }
+
+            double D = ((N - 1) * aD + (N - 1) * bD) / (N - 2);
+            double stud = Math.Sqrt((Math.Pow(aM - bM, 2) * Math.Pow(N, 2)) / (D * N * 2));
+            double fisher = 0;
+            if (aD >= bD)
+            {
+                fisher = aD / bD;
+            }
+            else
+            {
+                fisher = bD / aD;
+            }
+            MessageBox.Show($"Критерий Стьюдента = {stud}\n" +
+                $"Критерий Фишера = {fisher}");
         }
 
 
@@ -919,6 +993,11 @@ namespace _1_лаб_модел
         private void label20_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            StudentCriterion();
         }
     }
 }
