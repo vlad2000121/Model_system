@@ -666,7 +666,6 @@ namespace _1_лаб_модел
             this.timebuf_textbox.Name = "timebuf_textbox";
             this.timebuf_textbox.Size = new System.Drawing.Size(70, 20);
             this.timebuf_textbox.TabIndex = 74;
-            this.timebuf_textbox.Text = "20";
             // 
             // label20
             // 
@@ -695,7 +694,6 @@ namespace _1_лаб_модел
             this.probability_textBox1.Name = "probability_textBox1";
             this.probability_textBox1.Size = new System.Drawing.Size(70, 20);
             this.probability_textBox1.TabIndex = 76;
-            this.probability_textBox1.Text = "20";
             // 
             // label23
             // 
@@ -713,7 +711,6 @@ namespace _1_лаб_модел
             this.timebuffer_textBox1.Name = "timebuffer_textBox1";
             this.timebuffer_textBox1.Size = new System.Drawing.Size(70, 20);
             this.timebuffer_textBox1.TabIndex = 78;
-            this.timebuffer_textBox1.Text = "20";
             // 
             // label24
             // 
@@ -731,7 +728,6 @@ namespace _1_лаб_модел
             this.queue_lengthB_textBox1.Name = "queue_lengthB_textBox1";
             this.queue_lengthB_textBox1.Size = new System.Drawing.Size(70, 20);
             this.queue_lengthB_textBox1.TabIndex = 80;
-            this.queue_lengthB_textBox1.Text = "20";
             // 
             // label25
             // 
@@ -749,7 +745,6 @@ namespace _1_лаб_модел
             this.queue_lengthA_textBox.Name = "queue_lengthA_textBox";
             this.queue_lengthA_textBox.Size = new System.Drawing.Size(70, 20);
             this.queue_lengthA_textBox.TabIndex = 82;
-            this.queue_lengthA_textBox.Text = "20";
             // 
             // button3
             // 
