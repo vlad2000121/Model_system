@@ -18,7 +18,10 @@ namespace _1_лаб_модел
     public partial class Form1 : Form
     {
         //3 лаб
-     
+        Random random;
+        List<double> C;
+        List<double> q;
+
 
 
         int Ea_moment = 0;
@@ -165,6 +168,7 @@ namespace _1_лаб_модел
         {
             CheckForIllegalCrossThreadCalls = false;
             A();
+           
             new Thread(() =>
             {
                 BeginInvoke((MethodInvoker)(async () =>
@@ -174,7 +178,7 @@ namespace _1_лаб_модел
 
 
             }).Start();
-
+           
          //   await Task.Run(() => { modeling(); });
 
         }
@@ -232,6 +236,89 @@ namespace _1_лаб_модел
         }
 
 
+        //3 lab
+
+        
+
+        private double RandomNormal(double M, double G)
+        {
+            return G * Math.Cos(2 * Math.PI * random.NextDouble()) * Math.Sqrt(-2 * Math.Log(random.NextDouble())) + M;
+        }
+
+        private double CountRandom()
+        {
+            C = new List<double>(4) { 0.2449, 0.613, 0.01924, 0.0907 };
+            q = new List<double>();
+            random = new Random();
+            q.Clear();
+            double M = 2.0;
+            double G = 0.6667;
+            
+            for (int i = 0; i < C.Count; i++)
+            {
+                q.Add(RandomNormal(M, G));
+            }
+            double value = Enumerable.Range(0, C.Count).Select(i => C[i] * q[i]).Sum() + M;
+            q.Skip(1).ToList();
+            q.Add(RandomNormal(M, G));
+            return value;
+        }
+
+
+
+        //
+        /// <summary>
+        /// 
+        /// Разобрать параметр стьюдента и фишера подставить значения с методики
+        /// 
+        /// </summary>
+
+
+
+
+
+        private void StudentCriterion()
+        {
+            int N = 500;
+            List<double> a = new List<double>();
+            List<double> b = new List<double>();
+            for (int i = 0; i < N * 2; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    a.Add(CountRandom());
+                }
+                else
+                {
+                    b.Add(CountRandom());
+                }
+            }
+
+            double aM = a.Sum() / N;
+            double bM = b.Sum() / N;
+            double aD = 0;
+            double bD = 0;
+            for (int i = 0; i < N; i++)
+            {
+                aD += Math.Pow(a[i] - aM, 2) / (N - 1);
+                bD += Math.Pow(b[i] - bM, 2) / (N - 1);
+            }
+
+            double D = ((N - 1) * aD + (N - 1) * bD) / (N - 2);
+            double stud = Math.Sqrt((Math.Pow(aM - bM, 2) * Math.Pow(N, 2)) / (D * N * 2));
+            double fisher = 0;
+            if (aD >= bD)
+            {
+                fisher = aD / bD;
+            }
+            else
+            {
+                fisher = bD / aD;
+            }
+            MessageBox.Show($"Критерий Стьюдента = {stud}\n" +
+                $"Критерий Фишера = {fisher}");
+        }
+
 
         async void modeling() {
             int timeA=0;
@@ -264,6 +351,10 @@ namespace _1_лаб_модел
             double t5gaus = Math.Ceiling(Generator.NormalDistributionFunction(sigma, m2));
             double t6gaus = Math.Ceiling(Generator.NormalDistributionFunction(sigma, m3));
             //int hoarderA = 0;//накопитель А
+            double N = 0;                                                                             //3 лаб
+            bool errorN = false;
+
+
             int hoarderB = 0;
             int hoarderC = 0;
             int hoarderA = 0;
@@ -275,7 +366,7 @@ namespace _1_лаб_модел
             int statBC2 = 0;
 
 
-            while (hoarderC < 1000) {
+            while (hoarderC < 100 && time<1000) {
                 time++;
                 if (hoarderA < Ea_max)
                 {
@@ -285,9 +376,22 @@ namespace _1_лаб_модел
                     }
                 } else if (hoarderA >= Ea_max)
                 {
-                 //   MessageBox.Show("ошибка!");
-                    
+                    //   MessageBox.Show("ошибка!"); 
+                    N = Convert.ToInt32(Math.Round(CountRandom()));                                                    // N сбоев на входе в А
+                    if (N > 3)
+                    {
+                        if (hoarderA < Ea_max)                  // ПРИ СБОЕ НУЖНО ЛИ ПРОВЕРЯТЬ ВРЕМЯ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        {                                       // ПРИ СБОЕ НУЖНО ЛИ ПРОВЕРЯТЬ ВРЕМЯ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                           // if (time % t1gaus == 0)             // ПРИ СБОЕ НУЖНО ЛИ ПРОВЕРЯТЬ ВРЕМЯ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                          //  {
+                                hoarderA++;
+                          //  }
+                        }
+                    }
                 }
+
+              
+            
 
 
                 if (time % t2gaus/*t2*/ == 0 )   //AB1
@@ -299,29 +403,71 @@ namespace _1_лаб_модел
                             {
                                 statAB1 = 0;
                             }
-                            if (hoarderA > 0 /*&& hoarderB < Eb_max*/ /*&& bufferB>Er_max*/)
-                            {
-                                hoarderA--;
-                                statAB1++;
+                    if (hoarderA > 0 /*&& hoarderB < Eb_max*/ /*&& bufferB>Er_max*/)
+                    {
+                        hoarderA--;
+                        statAB1++;
 
-                            if (hoarderB >= Eb_max)
-                            {
+                        if (hoarderB >= Eb_max)
+                        {
                             //if (bufferB < Er_max) bufferB++;
-                                if (bufferB < Er_max)
-                                    {
-                                      bufferB++;
-                                      count_bufferB++;
+                            if (bufferB < Er_max)
+                            {
+                                bufferB++;
+                                count_bufferB++;
                                 timebuf_textbox.Text = Convert.ToString(count_bufferB);         // количество подключений буфера
                             }
+
+                            // 3 ЛАБ                                                ПРОВЕРКА НА СБОИ АВ1 
+                            else  //ПРОВЕРКА НА СБОИ АВ1    
+                            {
+                                errorN = true;
+
+                                //N = Math.Ceiling(CountRandom());                   // N сбоев
+                                //if (N > 3)
+                                //{
+                                //    if (hoarderB < Eb_max)
+                                //    {
+                                //        hoarderB++;
+                                //    }
+                                //}
                             }
+
+                        }
+                        if (hoarderB < Eb_max)
+                        {
+                            hoarderB++;
+                        }
+
+                    }
+
+                
+                    //3 лаб
+                    if (errorN == true) {
+                        N = Convert.ToInt32(Math.Round(CountRandom()));                  // N сбоев
+                        if (N > 3)
+                        {
                             if (hoarderB < Eb_max)
                             {
                                 hoarderB++;
+                                errorN = false;
                             }
+                            if (bufferB < Er_max)
+                            {
+                                errorN = false;
+                                bufferB++;
+                                count_bufferB++;
+                                timebuf_textbox.Text = Convert.ToString(count_bufferB);  // количество подключений буфера
+                            }
+                        }
+                        else { errorN = false; }
 
                     }
 
+
+
                     }
+
                     if (time % t3gaus /*t3*/ == 0 )         //AB2    
                     {
                         //pathAB2(time, hoarderA, hoarderB, statAB2);
@@ -339,41 +485,74 @@ namespace _1_лаб_модел
 
                              if (hoarderB >= Eb_max)
                                {
-                                    if (bufferB < Er_max)
-                                     {
-                                        bufferB++;
-                                        count_bufferB++;
+                            if (bufferB < Er_max)
+                            {
+                                bufferB++;
+                                count_bufferB++;
                                 timebuf_textbox.Text = Convert.ToString(count_bufferB);  // количество подключений буфера
+                            }
+
+                            //3 лаб
+                            else {
+                                errorN = true;
                             }
                                }
                              if (hoarderB < Eb_max) { 
                                 hoarderB++;
                                 }
 
+                             
+
                         }
                     }
 
-                      if (hoarderB > 0)  //buffer b изменение вп=ремени
-                      {
-                        //if (bufferB > Er_max)
-                        //{
-                        //time_bufferB++;
-                        //timebufferB.Text = Convert.ToString(time_bufferB);
-                        //}
-                          if (bufferB > Er_max / 2)
-                          {
+
+                //3 лаб
+                if (errorN == true)
+                {
+                    N = Convert.ToInt32(Math.Round(CountRandom()));                // N сбоев
+                    if (N > 3)
+                    {
+                        if (hoarderB < Eb_max)
+                        {
+                            hoarderB++;
+                            errorN = false;
+                        }
+                        if (bufferB < Er_max)
+                        {
+                            errorN = false;
+                            bufferB++;
+                            count_bufferB++;
+                            timebuf_textbox.Text = Convert.ToString(count_bufferB);  // количество подключений буфера
+                        }
+                    }
+                    else { errorN = false; }
+
+                }
+
+
+                if (hoarderB > 0)  //buffer b изменение вп=ремени
+                {
+                    //if (bufferB > Er_max)
+                    //{
+                    //time_bufferB++;
+                    //timebufferB.Text = Convert.ToString(time_bufferB);
+                    //}
+                    if (bufferB > Er_max / 2)
+                    {
                         //t4 = t6;
                         //t5 = t6;
                         t4gaus = t6gaus;
                         t5gaus = t6gaus;
-                          }
-                          else { 
+                    }
+                    else
+                    {
                         //t4 = Convert.ToInt32(t4_textBox.Text);
                         //  t5 = Convert.ToInt32(t5_textBox.Text);
-                        t4gaus= Math.Ceiling(Generator.NormalDistributionFunction(sigma, m2));
-                        t5gaus= Math.Ceiling(Generator.NormalDistributionFunction(sigma, m2)); 
+                        t4gaus = Math.Ceiling(Generator.NormalDistributionFunction(sigma, m2));
+                        t5gaus = Math.Ceiling(Generator.NormalDistributionFunction(sigma, m2));
                     }
-
+                
 
 
                     if (time % t4gaus == 0)         //BC1
@@ -384,21 +563,49 @@ namespace _1_лаб_модел
                           statBC1 = 0;
                       }
 
-                        if (bufferB > 0) 
-                        { 
+                        if (bufferB > 0)
+                        {
                             bufferB--;
                             statBC1++;
                             hoarderC++;
                         }
-                        else if (hoarderB > 0 && hoarderB < Eb_max && bufferB == 0) 
-                        { 
-                            hoarderB--; 
+                        else if (hoarderB > 0 && hoarderB < Eb_max && bufferB == 0)
+                        {
+                            hoarderB--;
                             statBC1++;
                             hoarderC++;
                         }
+
+                        //3 лаб
+                        else { errorN = true; }
                     
                         
                     }
+
+
+                    //3 лаб
+                    if (errorN == true)
+                    {
+                        N = Convert.ToInt32(Math.Round(CountRandom()));                   // N сбоев
+                        if (N > 3)
+                        {
+                            if (bufferB > 0)
+                            {
+                                bufferB--;
+                                hoarderC++;
+                                errorN = false;
+                            }
+                            else if (hoarderB > 0 && hoarderB < Eb_max && bufferB == 0)
+                            {
+                                hoarderB--;
+                                hoarderC++;
+                                errorN = false;
+                            }
+                        }else { errorN = false; }
+
+                    }
+
+
 
                     if (time % t5gaus == 0)               //BC2
                     {
@@ -422,6 +629,30 @@ namespace _1_лаб_модел
                             statBC2++;
                             hoarderC++;
                         }
+                        // 3 lab
+                        else { errorN = true; }
+
+                    }
+                    //3 лаб
+                    if (errorN == true)
+                    {
+                        N = Convert.ToInt32(Math.Round(CountRandom()));                // N сбоев
+                        if (N > 3)
+                        {
+                            if (bufferB > 0)
+                            {
+                                bufferB--;
+                                hoarderC++;
+                                errorN = false;
+                            }
+                            else if (hoarderB > 0 && hoarderB < Eb_max && bufferB == 0)
+                            {
+                                hoarderB--;
+                                hoarderC++;
+                                errorN = false;
+                            }
+                        }
+                        else { errorN = false; }
 
                     }
                 }
@@ -439,7 +670,7 @@ namespace _1_лаб_модел
                 //Длина очереди
                 queue_lengthA += hoarderA;
                 queue_lengthB += hoarderB;
-                if (hoarderC > 990)
+                if (hoarderC > 90 && time >980)
                 {
                     //Длина очереди
                   
@@ -919,6 +1150,11 @@ namespace _1_лаб_модел
         private void label20_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            StudentCriterion();
         }
     }
 }
