@@ -366,7 +366,7 @@ namespace _1_лаб_модел
             int statBC2 = 0;
 
 
-            while (hoarderC < 1000) {
+            while (hoarderC < 100 && time<1000) {
                 time++;
                 if (hoarderA < Ea_max)
                 {
@@ -390,7 +390,9 @@ namespace _1_лаб_модел
                     }
                 }
 
+              
             
+
 
                 if (time % t2gaus/*t2*/ == 0 )   //AB1
                     {
@@ -668,7 +670,7 @@ namespace _1_лаб_модел
                 //Длина очереди
                 queue_lengthA += hoarderA;
                 queue_lengthB += hoarderB;
-                if (hoarderC > 990)
+                if (hoarderC > 90 && time >980)
                 {
                     //Длина очереди
                   
